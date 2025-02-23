@@ -26,7 +26,7 @@ namespace nl_internal
 
 namespace nl
 {
-    const glm::vec3 world_up = {0, 0, 1};
+    const glm::vec3 world_up = {0, 1, 0};
 
     struct camera;
 
@@ -40,9 +40,12 @@ namespace nl
     struct static_model;
 }
 
+#include "camera.hpp"
+
 #include "resizable_buffer_template.hpp"
 
 #include "partitioned_buffer.hpp"
 #include "paged_buffer.hpp"
 
-#include "camera.hpp"
+#include "static_model.hpp"
+
