@@ -1,5 +1,6 @@
 #pragma once
 #include "nl.hpp"
+#include <vector>
 
 class nl::partitioned_buffer
 {
@@ -9,8 +10,8 @@ private:
     size_t  partitions_amount;
     size_t  total_partitions_size;
 
-    size_t* partitions_sizes_array;
-    size_t* partitions_offsets_array;
+    std::vector<size_t> partitions_sizes_array;
+    std::vector<size_t> partitions_offsets_array;
 
 public:
     partitioned_buffer(
@@ -23,8 +24,8 @@ public:
         partitions_amount = partitions_sizes.size();
 
         //calculate sizes and offsets lookup for each partition
-        partitions_sizes_array = new size_t[partitions_amount];
-        partitions_offsets_array = new size_t[partitions_amount];
+        partitions_sizes_array.resize(partitions_amount);
+        partitions_offsets_array.resize(partitions_amount);
 
         size_t offset = 0;
         auto itr = partitions_sizes.begin();
@@ -44,12 +45,6 @@ public:
         pikango::begin_command_buffer_recording(command_buffer);
         pikango::cmd::assign_buffer_memory(buffer, total_partitions_size, memory_profile, access_profile);
         pikango::end_command_buffer_recording(command_buffer);
-    }
-
-    ~partitioned_buffer()
-    {
-        delete partitions_sizes_array;
-        delete partitions_offsets_array;
     }
 
     inline pikango::buffer_handle get_buffer() noexcept
