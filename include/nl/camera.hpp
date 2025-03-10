@@ -9,17 +9,13 @@ private:
     glm::vec3 right;
 
 private:
-    inline void update_front() noexcept
+    inline void update_directions() noexcept
     {
         front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
         front.y = sin(glm::radians(pitch));
         front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
         front = glm::normalize(front);
-    }
 
-    inline void update_directions() noexcept
-    {
-        update_front();
         right = glm::normalize(glm::cross(front, world_up));
         up = glm::normalize(glm::cross(right, front));
     }
@@ -51,7 +47,7 @@ public:
 
     inline const glm::vec3& get_front_vector() noexcept
     {
-        update_front();
+        update_directions();
         return front;
     }
 
