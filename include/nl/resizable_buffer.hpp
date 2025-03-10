@@ -1,5 +1,11 @@
 #pragma once
-#include "nl.hpp"
+#include "pikango/pikango.hpp"
+
+namespace nl_internal
+{
+    template<size_t(data_size_round_function)(size_t data_size)>
+    class resizable_buffer_template;
+}
 
 template<size_t(data_size_round_function)(size_t data_size)>
 class nl_internal::resizable_buffer_template
@@ -63,3 +69,28 @@ public:
         pikango::cmd::write_buffer_region(buffer, data_size, data, data_offset);
     }
 };
+
+namespace nl_internal
+{
+    inline size_t snap_to_power_of_two(size_t n) noexcept
+    {
+        n |= n >> 1;
+        n |= n >> 2;
+        n |= n >> 4;
+        n |= n >> 8;
+        n |= n >> 16;
+        n |= n >> 32;
+        return n + 1;
+    }
+
+    inline size_t return_n(size_t n) noexcept
+    {
+        return n;
+    }
+}
+
+namespace nl
+{
+    using  loose_resizable_buffer = nl_internal::resizable_buffer_template<nl_internal::snap_to_power_of_two>;
+    using  tight_resizable_buffer = nl_internal::resizable_buffer_template<nl_internal::return_n>;
+}

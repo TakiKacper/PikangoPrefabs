@@ -1,5 +1,14 @@
 #pragma once
-#include "nl.hpp"
+
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
+namespace nl
+{
+    const glm::vec3 camera_world_up = {0, 1, 0};
+    struct camera;
+}
 
 struct nl::camera
 {
@@ -16,7 +25,7 @@ private:
         front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
         front = glm::normalize(front);
 
-        right = glm::normalize(glm::cross(front, world_up));
+        right = glm::normalize(glm::cross(front, camera_world_up));
         up = glm::normalize(glm::cross(right, front));
     }
 
@@ -63,3 +72,4 @@ public:
         return up;
     }
 };
+

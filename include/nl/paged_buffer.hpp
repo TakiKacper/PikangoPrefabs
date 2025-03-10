@@ -1,10 +1,15 @@
 #pragma once
-#include "nl.hpp"
+#include "pikango/pikango.hpp"
 
 #include <list>
 #include <set>
 #include <vector>
 #include <unordered_map>
+
+namespace nl
+{
+    class paged_buffer;
+}
 
 class nl::paged_buffer
 {

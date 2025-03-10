@@ -1,6 +1,12 @@
 #pragma once
-#include "nl.hpp"
+#include "pikango/pikango.hpp"
+
 #include <vector>
+
+namespace nl
+{
+    class partitioned_buffer;
+}
 
 class nl::partitioned_buffer
 {
