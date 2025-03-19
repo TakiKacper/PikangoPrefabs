@@ -9,7 +9,9 @@ namespace nl
 struct nl::rendertarget
 {
 private:
-    bool textures_attached = false;
+    size_t                          current_width;
+    size_t                          current_height;
+    size_t                          color_attachments_amount;
     pikango::texture_sized_format   color_format;
 
     pikango::frame_buffer_handle                frame_buffer;
@@ -17,83 +19,80 @@ private:
     pikango::texture_buffer_handle              depth_stencil;
 
 private:
-    void attach_textures()
+    void create_attachments()
     {
-        for (int i = 0; i < color.size(); i++)
+        pikango::texture_buffer_create_info tbci;
+
+        tbci.type           = pikango::texture_type::texture_2d;
+        tbci.mipmap_layers  = 1;
+        tbci.memory_format  = color_format;
+        tbci.dim1           = current_width;
+        tbci.dim2           = current_height;
+        tbci.dim3           = 1;  
+
+        for (int i = 0; i < color_attachments_amount; i++)
         {
+            auto attachment = pikango::new_texture_buffer(tbci);
+            color.push_back(attachment);
+
             pikango::attach_to_frame_buffer(
-                frame_buffer,
-                color[i],
+                frame_buffer, 
+                attachment, 
                 pikango::framebuffer_attachment_type::color, 
                 i
             );
         }
 
+        tbci.memory_format = pikango::texture_sized_format::depth_24_stencil_8;
+
+        depth_stencil = pikango::new_texture_buffer(tbci);
+
         pikango::attach_to_frame_buffer(
-            frame_buffer, 
-            depth_stencil, 
-            pikango::framebuffer_attachment_type::depth, 0
+            frame_buffer,
+            depth_stencil,
+            pikango::framebuffer_attachment_type::depth,
+            0
         );
 
         pikango::attach_to_frame_buffer(
-            frame_buffer, 
-            depth_stencil, 
-            pikango::framebuffer_attachment_type::stencil, 0
+            frame_buffer,
+            depth_stencil,
+            pikango::framebuffer_attachment_type::stencil,
+            0
         );
-
-        textures_attached = true;
     }
 
 public:
-    void cmd_resize(size_t width, size_t height)
+    void resize(size_t width, size_t height)
     {
-        for (auto& texture : color)
-        {
-            pikango::cmd::assign_texture_buffer_memory(
-                texture,
-                pikango::texture_type::texture_2d, 1, 
-                color_format,
-                width, height, 1
-            );
-        }
+        if (width == current_width && height == current_height) return;
 
-        pikango::cmd::assign_texture_buffer_memory(
-            depth_stencil,
-            pikango::texture_type::texture_2d, 1, 
-            pikango::texture_sized_format::depth_24_stencil_8,
-            width, height, 1
-        );
+        color.clear();
+        depth_stencil.~handle();
+
+        create_attachments();
     }
 
     rendertarget(
-        pikango::command_buffer_handle& command_buffer,
         size_t                          width,
         size_t                          height,
         size_t                          color_attachments,
         pikango::texture_sized_format   color_attachments_format
     )
     {
-        color_format = color_attachments_format;
-        textures_attached = false;
-
-        //Allocate resources
-        frame_buffer = pikango::new_frame_buffer();
-
-        for (int i = 0; i < color_attachments; i++)
-            color.push_back(pikango::new_texture_buffer());
-
-        depth_stencil = pikango::new_texture_buffer();
+        current_width  = width;
+        current_height = height;
         
-        //Allocate buffer memory
-        pikango::begin_command_buffer_recording(command_buffer);
-        cmd_resize(width, height);
-        pikango::end_command_buffer_recording(command_buffer);
+        color_attachments_amount = color_attachments;
+        color_format             = color_attachments_format;
+
+        frame_buffer = pikango::new_frame_buffer(pikango::frame_buffer_create_info{});
+        create_attachments();
     }
 
-    void cmd_bind_frame_buffer()
+    pikango::frame_buffer_handle get_frame_buffer()
     {
-        if (!textures_attached) attach_textures();
-        pikango::cmd::bind_frame_buffer(frame_buffer);
+        return frame_buffer;
     }
 
     pikango::texture_buffer_handle get_color_texture(size_t index)

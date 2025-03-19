@@ -57,7 +57,6 @@ private:
     pikango::buffer_memory_profile  pages_memory_profile;
     pikango::buffer_access_profile  pages_access_profile;
 
-    std::vector<std::list<page_info>::iterator> pages_to_allocate;
     std::list<page_info> pages;
 
     size_t partitions_names_gen = 0;
@@ -89,15 +88,20 @@ private:
 
     void create_page(size_t size)
     {
+        pikango::buffer_create_info bci;
+        bci.buffer_size_bytes = size;
+        bci.memory_profile = pages_memory_profile;
+        bci.access_profile = pages_access_profile;
+
+        auto buffer = pikango::new_buffer(bci);
+
         page_info page;
 
         page.size = size;
-        page.buffer = pikango::new_buffer();
+        page.buffer = buffer;
 
         pages.push_back(page);
         auto page_itr = (--pages.end());
-
-        pages_to_allocate.push_back(page_itr);
 
         partition_info info;
         info.offset = 0;
@@ -105,13 +109,6 @@ private:
         info.page = page_itr;
 
         push_free_partition(info);
-    }
-
-    inline void cmd_assign_pages_memory()
-    {
-        for (auto& p : pages_to_allocate)
-            pikango::cmd::assign_buffer_memory(p->buffer, p->size, pages_memory_profile, pages_access_profile);
-        pages_to_allocate.clear();
     }
 
     void erase_page(std::list<page_info>::iterator page)
@@ -167,7 +164,6 @@ private:
 
 public:
     paged_buffer(
-        pikango::command_buffer_handle& command_buffer,
         size_t                          page_size,
         size_t                          partition_alignment,
         pikango::buffer_memory_profile  memory_profile,
@@ -181,9 +177,7 @@ public:
         pages_access_profile = access_profile;
 
         //create one page, for starters
-        pikango::begin_command_buffer_recording(command_buffer);
         create_page(default_page_size);
-        pikango::end_command_buffer_recording(command_buffer);
     }
 
     inline pikango::buffer_handle get_partition_buffer(size_t partition) noexcept
@@ -263,8 +257,6 @@ public:
 
     inline void cmd_write_parition(size_t partition, void* data) noexcept
     {
-        cmd_assign_pages_memory();
-
         auto itr = allocated_partitions.find(partition);
         if (itr == allocated_partitions.end()) return;
         
@@ -280,8 +272,6 @@ public:
 
     inline void cmd_write_parition_region(size_t partition, void* data, size_t data_size, size_t data_offset) noexcept
     {
-        cmd_assign_pages_memory();
-
         auto itr = allocated_partitions.find(partition);
         if (itr == allocated_partitions.end()) return;
         

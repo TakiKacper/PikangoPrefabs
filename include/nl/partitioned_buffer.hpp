@@ -21,7 +21,6 @@ private:
 
 public:
     partitioned_buffer(
-        pikango::command_buffer_handle& command_buffer, 
         std::initializer_list<size_t>   partitions_sizes,
         pikango::buffer_memory_profile  memory_profile,
         pikango::buffer_access_profile  access_profile
@@ -47,10 +46,13 @@ public:
         total_partitions_size = offset;
 
         //create buffer on gpu
-        buffer = pikango::new_buffer();
-        pikango::begin_command_buffer_recording(command_buffer);
-        pikango::cmd::assign_buffer_memory(buffer, total_partitions_size, memory_profile, access_profile);
-        pikango::end_command_buffer_recording(command_buffer);
+        pikango::buffer_create_info info;
+
+        info.buffer_size_bytes = total_partitions_size;
+        info.access_profile = access_profile;
+        info.memory_profile = memory_profile;
+
+        buffer = pikango::new_buffer(info);
     }
 
     inline pikango::buffer_handle get_buffer() noexcept
