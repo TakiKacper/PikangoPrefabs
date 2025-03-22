@@ -7,8 +7,8 @@
 
 !/include
 /include/*
-!/include/nl
-!/include/nl/*
+!/include/pikango_prefabs
+!/include/pikango_prefabs/*
 
 !/docs/
 !/docs/*

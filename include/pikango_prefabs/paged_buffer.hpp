@@ -6,12 +6,12 @@
 #include <vector>
 #include <unordered_map>
 
-namespace nl
+namespace pikango_prefabs
 {
     class paged_buffer;
 }
 
-class nl::paged_buffer
+class pikango_prefabs::paged_buffer
 {
 private:
     struct page_info

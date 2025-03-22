@@ -1,7 +1,7 @@
 #pragma once
 #include "nl.hpp"
 
-class nl::static_model
+class pikango_prefabs::static_model
 {
 private:
     size_t buffer_partition = 0;

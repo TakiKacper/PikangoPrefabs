@@ -4,13 +4,13 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-namespace nl
+namespace pikango_prefabs
 {
     const glm::vec3 camera_world_up = {0, 1, 0};
     struct camera;
 }
 
-struct nl::camera
+struct pikango_prefabs::camera
 {
 private:
     glm::vec3 front;

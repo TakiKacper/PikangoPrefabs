@@ -1,12 +1,12 @@
 #pragma once
 #include "pikango/pikango.hpp"
 
-namespace nl
+namespace pikango_prefabs
 {
     struct rendertarget;
 }
 
-struct nl::rendertarget
+struct pikango_prefabs::rendertarget
 {
 private:
     size_t                          current_width;

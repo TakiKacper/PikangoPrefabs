@@ -1,14 +1,14 @@
 #pragma once
 #include "pikango/pikango.hpp"
 
-namespace nl_internal
+namespace pikango_prefabs_internal
 {
     template<size_t(data_size_round_function)(size_t data_size)>
     class resizable_buffer_template;
 }
 
 template<size_t(data_size_round_function)(size_t data_size)>
-class nl_internal::resizable_buffer_template
+class pikango_prefabs_internal::resizable_buffer_template
 {
 private:
     pikango::buffer_handle buffer;
@@ -70,7 +70,7 @@ public:
     }
 };
 
-namespace nl_internal
+namespace pikango_prefabs_internal
 {
     inline size_t snap_to_power_of_two(size_t n) noexcept
     {
@@ -89,7 +89,7 @@ namespace nl_internal
     }
 }
 
-namespace nl
+namespace pikango_prefabs
 {
     using  loose_resizable_buffer = nl_internal::resizable_buffer_template<nl_internal::snap_to_power_of_two>;
     using  tight_resizable_buffer = nl_internal::resizable_buffer_template<nl_internal::return_n>;

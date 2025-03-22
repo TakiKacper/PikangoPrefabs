@@ -3,12 +3,12 @@
 
 #include <vector>
 
-namespace nl
+namespace pikango_prefabs
 {
     class partitioned_buffer;
 }
 
-class nl::partitioned_buffer
+class pikango_prefabs::partitioned_buffer
 {
 private:
     pikango::buffer_handle buffer;
